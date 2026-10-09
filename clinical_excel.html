@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinical Management System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', 'Calibri', 'Arial', sans-serif;
+  background: #f0f2f5;
+  color: #1e293b;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* === CMS LAYOUT === */
+.cms-layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  padding: 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-brand span { color: #60a5fa; }
+
+.sidebar-nav { padding: 12px 0; flex: 1; }
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255,255,255,0.05);
+  color: #e2e8f0;
+}
+
+.sidebar-nav a.active {
+  background: rgba(96,165,250,0.1);
+  color: #60a5fa;
+  border-left-color: #60a5fa;
+}
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Main Area */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Top Navbar */
+.top-navbar {
+  background: white;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.top-navbar h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-navbar h1 .unsaved {
+  color: #ef4444;
+  font-size: 1.4rem;
+  line-height: 1;
+  display: none;
+}
+
+.top-navbar h1 .unsaved.show { display: inline; }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* Toolbar */
+.toolbar {
+  background: white;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.toolbar .search-box {
+  position: relative;
+  flex: 0 0 280px;
+}
+
+.toolbar .search-box input {
+  width: 100%;
+  padding: 7px 12px 7px 34px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border 0.15s;
+}
+
+.toolbar .search-box input:focus { border-color: #3b82f6; }
+
+.toolbar .search-box::before {
+  content: '🔍';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+}
+
+.toolbar-btn {
+  padding: 7px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.82rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  color: #374151;
+}
+
+.toolbar-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.toolbar-btn.primary {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.toolbar-btn.primary:hover { background: #1d4ed8; }
+
+.toolbar-btn.danger {
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.toolbar-btn.danger:hover {
+  background: #fef2f2;
+}
+
+.toolbar-btn.save {
+  background: #059669;
+  color: white;
+  border-color: #059669;
+}
+
+.toolbar-btn.save:hover { background: #047857; }
+
+.row-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #059669;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  z-index: 9999;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+}
+
+.toast.show { transform: translateX(0); }
+
+/* === SPREADSHEET === */
+.spreadsheet-wrapper {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background: #f8fafc;
+}
+
+.spreadsheet {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  font-size: 13px;
+  font-family: 'Calibri', 'Arial', sans-serif;
+  user-select: none;
+}
+
+/* Column header row */
+.spreadsheet thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.spreadsheet th {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  padding: 0;
+  font-weight: 600;
+  color: #374151;
+  text-align: left;
+  position: relative;
+  white-space: nowrap;
+}
+
+.spreadsheet th .th-content {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.spreadsheet th .th-letter {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-left: 8px;
+}
+
+/* Column resize handle */
+.spreadsheet th .resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  z-index: 11;
+}
+
+.spreadsheet th .resize-handle:hover { background: #3b82f6; }
+
+/* Row number column */
+.spreadsheet th.row-num-header,
+.spreadsheet td.row-num {
+  background: #f3f4f6;
+  color: #6b7280;
+  text-align: center;
+  width: 45px;
+  min-width: 45px;
+  max-width: 45px;
+  font-size: 12px;
+  border-right: 2px solid #d1d5db;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+}
+
+.spreadsheet th.row-num-header { z-index: 12; }
+
+/* Cells */
+.spreadsheet td {
+  border: 1px solid #e5e7eb;
+  padding: 0;
+  height: 30px;
+  vertical-align: middle;
+  position: relative;
+  cursor: cell;
+}
+
+.spreadsheet td .cell-content {
+  padding: 4px 8px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Alternating rows */
+.spreadsheet tbody tr:nth-child(even) td { background: #fafbfc; }
+.spreadsheet tbody tr:nth-child(even) td.row-num { background: #f0f1f3; }
+.spreadsheet tbody tr:hover td { background: #f0f7ff; }
+.spreadsheet tbody tr:hover td.row-num { background: #e8f0fe; }
+
+/* Cell states */
+td.selected {
+  outline: 2px solid #2563eb;
+  outline-offset: -1px;
+  background: #eff6ff !important;
+  z-index: 2;
+}
+
+td.in-range {
+  background: #dbeafe !important;
+}
+
+td.editing {
+  outline: 2px solid #2563eb;
+  outline-offset: -1px;
+  background: #ffffff !important;
+  z-index: 3;
+}
+
+td.editing input,
+td.editing select {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-family: 'Calibri', 'Arial', sans-serif;
+  background: transparent;
+}
+
+td.search-match .cell-content {
+  background: #fef08a;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-active { background: #dcfce7; color: #166534; }
+.status-critical { background: #fee2e2; color: #991b1b; }
+.status-followup { background: #fef9c3; color: #854d0e; }
+.status-discharged { background: #f1f5f9; color: #475569; }
+
+/* Context Menu */
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  padding: 4px 0;
+  z-index: 9999;
+  min-width: 180px;
+  display: none;
+  font-size: 0.85rem;
+}
+
+.context-menu.show { display: block; }
+
+.context-menu-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.1s;
+  color: #374151;
+}
+
+.context-menu-item:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.context-menu-item.danger { color: #dc2626; }
+.context-menu-item.danger:hover { background: #fef2f2; }
+
+.context-menu-separator {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 4px 0;
+}
+
+/* Keyboard hint */
+.keyboard-hints {
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  padding: 6px 24px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.keyboard-hints kbd {
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.7rem;
+  font-family: inherit;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="cms-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand" style="padding: 12px 16px; display: flex; align-items: center; justify-content: center;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Jindal_Steel_and_Power_Logo.svg" alt="Jindal Steel" style="max-height: 40px; object-fit: contain;">
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" onclick="return false">📊 Dashboard</a>
+      <a href="#" class="active" onclick="return false">📋 Patients</a>
+      <a href="#" onclick="return false">👨‍⚕️ Doctors</a>
+      <a href="#" onclick="return false">📅 Appointments</a>
+      <a href="#" onclick="return false">💊 Pharmacy</a>
+      <a href="#" onclick="return false">🩺 OPD Records</a>
+      <a href="#" onclick="return false">🚑 Emergency</a>
+      <a href="#" onclick="return false">📈 Reports</a>
+      <a href="#" onclick="return false">⚙️ Settings</a>
+    </nav>
+    <div class="sidebar-footer">v2.1.0 • Plant Clinic Suite</div>
+  </div>
+
+  <!-- Main Area -->
+  <div class="main-area">
+    <!-- Top Navbar -->
+    <div class="top-navbar">
+      <h1>
+        📋 Patient Records
+        <span class="unsaved" id="unsavedIndicator" title="Unsaved changes">●</span>
+      </h1>
+      <div class="user-info">
+        <span>Dr. Admin</span>
+        <div class="user-avatar">DA</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search patients..." oninput="handleSearch()">
+      </div>
+
+      <div style="display:flex; gap:4px; align-items:center; background:white; padding:4px; border:1px solid #cbd5e1; border-radius:6px;">
+        <button onclick="setZoom(-0.1)" style="background:transparent; border:none; cursor:pointer; padding:4px; font-weight:bold;" title="Zoom Out">➖</button>
+        <span id="zoomLabel" style="font-size:0.8rem; font-weight:600; color:#475569; min-width:40px; text-align:center;">100%</span>
+        <button onclick="setZoom(0.1)" style="background:transparent; border:none; cursor:pointer; padding:4px; font-weight:bold;" title="Zoom In">➕</button>
+      </div>
+
+      <div style="display:flex; gap:4px; align-items:center; background:white; padding:4px; border:1px solid #cbd5e1; border-radius:6px;">
+        <button id="undoBtn" onclick="undo()" disabled style="background:transparent; border:none; cursor:pointer; padding:4px; font-weight:bold;" title="Undo (Ctrl+Z)">↩️</button>
+        <button id="redoBtn" onclick="redo()" disabled style="background:transparent; border:none; cursor:pointer; padding:4px; font-weight:bold;" title="Redo (Ctrl+Y)">↪️</button>
+      </div>
+
+      <button class="toolbar-btn" onclick="addRow()" title="Add a new patient row">➕ Add Row</button>
+      <button class="toolbar-btn" onclick="deleteSelected()" style="color: #dc2626;" title="Delete selected rows or columns">🗑 Delete</button>
+      <button class="toolbar-btn" onclick="handleSerialize()" style="color: #16a34a;" title="Fill Series Downwards">🔢 Serialize</button>
+      
+      <div style="display:flex; gap:6px; padding:0 12px; border-left:1px solid #cbd5e1; border-right:1px solid #cbd5e1; align-items:center;">
+        <button onclick="applyColor('#fef08a')" style="width:24px;height:24px;border-radius:50%;background:#fef08a;border:1px solid #eab308;cursor:pointer;" title="Highlight Yellow"></button>
+        <button onclick="applyColor('#dcfce7')" style="width:24px;height:24px;border-radius:50%;background:#dcfce7;border:1px solid #22c55e;cursor:pointer;" title="Highlight Green"></button>
+        <button onclick="applyColor('#fee2e2')" style="width:24px;height:24px;border-radius:50%;background:#fee2e2;border:1px solid #ef4444;cursor:pointer;" title="Highlight Red"></button>
+        <button onclick="applyColor('#dbeafe')" style="width:24px;height:24px;border-radius:50%;background:#dbeafe;border:1px solid #3b82f6;cursor:pointer;" title="Highlight Blue"></button>
+        <button onclick="applyColor('#ffedd5')" style="width:24px;height:24px;border-radius:50%;background:#ffedd5;border:1px solid #f97316;cursor:pointer;" title="Highlight Orange"></button>
+        <button onclick="applyColor('')" style="width:24px;height:24px;border-radius:50%;background:white;border:1px solid #cbd5e1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;" title="Clear Highlight">🚫</button>
+      </div>
+
+      <button class="toolbar-btn" onclick="triggerImport()">📥 Import Excel/CSV</button>
+      <input type="file" id="importInput" style="display:none" onchange="handleImport(event)" accept=".xlsx, .xls, .csv">
+      <button class="toolbar-btn" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="toolbar-btn save" onclick="saveData()">💾 Save</button>
+      <span class="row-count" id="rowCount">Showing 0 of 0 patients</span>
+    </div>
+
+    <!-- Spreadsheet -->
+    <div class="spreadsheet-wrapper" id="spreadsheetWrapper">
+      <table class="spreadsheet" id="spreadsheet">
+        <thead id="spreadsheetHead"></thead>
+        <tbody id="spreadsheetBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Keyboard Hints -->
+    <div class="keyboard-hints">
+      <span><kbd>Tab</kbd> Next cell</span>
+      <span><kbd>Enter</kbd> Move down</span>
+      <span><kbd>Shift+Tab</kbd> Previous</span>
+      <span><kbd>Esc</kbd> Cancel edit</span>
+      <span><kbd>Ctrl+Z</kbd> Undo</span>
+      <span><kbd>Ctrl+S</kbd> Save</span>
+      <span><kbd>Arrow Keys</kbd> Navigate</span>
+      <span><kbd>Right-click</kbd> Context menu</span>
+    </div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="context-menu" id="contextMenu">
+  <div class="context-menu-item" onclick="contextAction('insertAbove')">⬆️ Insert Row Above</div>
+  <div class="context-menu-item" onclick="contextAction('insertBelow')">⬇️ Insert Row Below</div>
+  <div class="context-menu-separator"></div>
+  <div class="context-menu-item" onclick="contextAction('copyRow')">📋 Copy Row</div>
+  <div class="context-menu-item" onclick="contextAction('clearCell')">🧹 Clear Cell / Selection</div>
+  <div class="context-menu-item" onclick="contextAction('clearColumn')">🧹 Clear Entire Column</div>
+  <div class="context-menu-separator"></div>
+  <div class="context-menu-item" onclick="contextAction('fillDown')">➡️ Fill Down (Ctrl+D)</div>
+  <div class="context-menu-item" onclick="contextAction('fillSeries')">➡️ Fill Series (1, 2, 3...)</div>
+  <div class="context-menu-separator"></div>
+  <div class="context-menu-item danger" onclick="contextAction('deleteRow')">🗑 Delete Row(s)</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Changes saved!</div>
+
+<script>
+// === COLUMN DEFINITIONS ===
+const columns = [
+  { key: 'patientId', label: 'Patient ID', letter: 'A', width: 100, type: 'text' },
+  { key: 'patientName', label: 'Patient Name', letter: 'B', width: 160, type: 'text' },
+  { key: 'age', label: 'Age', letter: 'C', width: 60, type: 'number' },
+  { key: 'gender', label: 'Gender', letter: 'D', width: 90, type: 'select', options: ['Male', 'Female', 'Other'] },
+  { key: 'diagnosis', label: 'Diagnosis', letter: 'E', width: 180, type: 'text' },
+  { key: 'doctor', label: 'Assigned Doctor', letter: 'F', width: 160, type: 'text' },
+  { key: 'visitDate', label: 'Visit Date', letter: 'G', width: 130, type: 'date' },
+  { key: 'status', label: 'Status', letter: 'H', width: 120, type: 'status', options: ['Active', 'Critical', 'Follow-up', 'Discharged'] },
+  { key: 'notes', label: 'Notes', letter: 'I', width: 220, type: 'text' },
+];
+
+// === INITIAL DATA ===
+let data = [
+  { patientId: 'PAT-001', patientName: 'Rajesh Kumar', age: 45, gender: 'Male', diagnosis: 'Heat Exhaustion', doctor: 'Dr. Sharma', visitDate: '2026-06-09', status: 'Active', notes: 'Blast Furnace worker, hydration protocol' },
+  { patientId: 'PAT-002', patientName: 'Suresh Yadav', age: 38, gender: 'Male', diagnosis: 'Chemical Burns - Left Arm', doctor: 'Dr. Patel', visitDate: '2026-06-08', status: 'Critical', notes: 'Coke Oven exposure, referred to burns unit' },
+  { patientId: 'PAT-003', patientName: 'Priya Sharma', age: 29, gender: 'Female', diagnosis: 'Noise-Induced Hearing Loss', doctor: 'Dr. Singh', visitDate: '2026-06-07', status: 'Follow-up', notes: 'Rolling Mill, audiometry scheduled' },
+  { patientId: 'PAT-004', patientName: 'Amit Tiwari', age: 52, gender: 'Male', diagnosis: 'Lower Back Strain', doctor: 'Dr. Gupta', visitDate: '2026-06-06', status: 'Active', notes: 'Heavy lifting injury, physiotherapy advised' },
+  { patientId: 'PAT-005', patientName: 'Kavita Devi', age: 34, gender: 'Female', diagnosis: 'Eye Irritation - Dust', doctor: 'Dr. Sharma', visitDate: '2026-06-05', status: 'Discharged', notes: 'Sinter Plant, eye wash given, cleared' },
+  { patientId: 'PAT-006', patientName: 'Mohan Lal', age: 48, gender: 'Male', diagnosis: 'Hypertension - Stage 2', doctor: 'Dr. Patel', visitDate: '2026-06-04', status: 'Follow-up', notes: 'BP 160/100, Amlodipine 5mg started' },
+  { patientId: 'PAT-007', patientName: 'Sunita Kumari', age: 41, gender: 'Female', diagnosis: 'Respiratory Distress', doctor: 'Dr. Singh', visitDate: '2026-06-03', status: 'Critical', notes: 'Gas inhalation in Power Plant area' },
+  { patientId: 'PAT-008', patientName: 'Vikram Singh', age: 55, gender: 'Male', diagnosis: 'Minor Laceration - Right Hand', doctor: 'Dr. Gupta', visitDate: '2026-06-02', status: 'Discharged', notes: 'Stitched, tetanus given, review in 7 days' },
+];
+
+let nextPatientNum = 9;
+
+// === STATE ===
+let selectedCell = null; // {row, col}
+let editingCell = null;
+let rangeStart = null;
+let rangeEnd = null;
+let isSelecting = false;
+let undoStack = [];
+let redoStack = [];
+let searchTerm = '';
+let visibleRows = [];
+let contextRow = null;
+let contextCol = null;
+let selectionType = 'cell'; // 'cell', 'row', 'column'
+let editingHeader = null; // colIdx
+let rowHeights = {}; // rowIdx -> height (px)
+let resizingRow = null;
+let resizeStartY = 0;
+let resizeStartHeight = 0;
+
+// Resize state
+let resizingCol = null;
+let resizeStartX = 0;
+let resizeStartWidth = 0;
+
+let zoomLevel = 1;
+
+function setZoom(delta) {
+  zoomLevel = Math.max(0.5, Math.min(2, zoomLevel + delta));
+  document.getElementById('zoomLabel').innerText = Math.round(zoomLevel * 100) + '%';
+  document.getElementById('spreadsheet').style.zoom = zoomLevel;
+}
+
+const evaluateFormula = (formulaStr, allData, cols) => {
+  if (!formulaStr || !String(formulaStr).startsWith('=')) return formulaStr;
+  try {
+    let expr = String(formulaStr).substring(1).toUpperCase();
+    
+    expr = expr.replace(/SUM\(([A-Z]+)(\d+):([A-Z]+)(\d+)\)/g, (match, c1, r1, c2, r2) => {
+      let sum = 0;
+      const startR = Math.min(parseInt(r1), parseInt(r2)) - 1;
+      const endR = Math.max(parseInt(r1), parseInt(r2)) - 1;
+      const c1Idx = cols.findIndex(c => c.letter === c1);
+      const c2Idx = cols.findIndex(c => c.letter === c2);
+      if (c1Idx === -1 || c2Idx === -1) return 0;
+      const startC = Math.min(c1Idx, c2Idx);
+      const endC = Math.max(c1Idx, c2Idx);
+      for (let r = startR; r <= endR; r++) {
+        if (!allData[r]) continue;
+        for (let c = startC; c <= endC; c++) {
+          const val = allData[r][cols[c].key];
+          let numVal = val;
+          if (String(val).startsWith('=')) numVal = evaluateFormula(val, allData, cols);
+          const num = parseFloat(numVal);
+          if (!isNaN(num)) sum += num;
+        }
+      }
+      return sum;
+    });
+
+    expr = expr.replace(/([A-Z]+)(\d+)/g, (match, letter, rowStr) => {
+      const col = cols.find(c => c.letter === letter);
+      if (!col) return 0;
+      const rIdx = parseInt(rowStr) - 1;
+      if (!allData[rIdx]) return 0;
+      const val = allData[rIdx][col.key];
+      let numVal = val;
+      if (String(val).startsWith('=')) numVal = evaluateFormula(val, allData, cols);
+      const num = parseFloat(numVal);
+      return isNaN(num) ? 0 : num;
+    });
+
+    const result = new Function(`return ${expr}`)();
+    return Number.isFinite(result) ? Math.round(result * 100) / 100 : '#ERROR!';
+  } catch (err) {
+    return '#ERROR!';
+  }
+};
+
+// === RENDER ===
+function render() {
+  renderHead();
+  renderBody();
+  updateRowCount();
+}
+
+function renderHead() {
+  const thead = document.getElementById('spreadsheetHead');
+  let html = '<tr><th class="row-num-header" onclick="selectAll()" style="cursor:pointer" title="Select All"><div class="th-content">#</div></th>';
+  columns.forEach((col, i) => {
+    html += `<th style="width:${col.width}px;min-width:${col.width}px;cursor:pointer" onclick="selectWholeColumn(${i})" title="Select Column ${col.letter}">
+      <div class="th-content">${col.label}<span class="th-letter">${col.letter}</span></div>
+      <div class="resize-handle" onmousedown="startResize(event, ${i})"></div>
+    </th>`;
+  });
+  html += '</tr>';
+  thead.innerHTML = html;
+}
+
+function renderBody() {
+  const tbody = document.getElementById('spreadsheetBody');
+  const term = searchTerm.toLowerCase();
+  visibleRows = [];
+
+  let html = '';
+  data.forEach((row, rowIdx) => {
+    // Search filter
+    if (term) {
+      const match = columns.some(col => {
+        const val = row[col.key];
+        if (val === null || val === undefined) return false;
+        return String(val).toLowerCase().includes(term);
+      });
+      if (!match) return;
+    }
+    visibleRows.push(rowIdx);
+
+    html += `<tr data-row="${rowIdx}">`;
+    html += `<td class="row-num" onclick="selectWholeRow(${rowIdx})" style="cursor:pointer" title="Select Row ${rowIdx + 1}">${rowIdx + 1}</td>`;
+
+    columns.forEach((col, colIdx) => {
+      const isSelected = selectedCell && selectedCell.row === rowIdx && selectedCell.col === colIdx;
+      const isEditing = editingCell && editingCell.row === rowIdx && editingCell.col === colIdx;
+      const isInRange = isCellInRange(rowIdx, colIdx);
+      const isMatch = term && String(row[col.key]).toLowerCase().includes(term);
+
+      let classes = [];
+      let inlineStyle = "";
+      
+      const storedColor = row._cellStyles ? row._cellStyles[col.key] : null;
+      if (storedColor && !isMatch && !isInRange && !isSelected) {
+        inlineStyle = `background-color: ${storedColor} !important;`;
+      }
+
+      if (isSelected) classes.push('selected');
+      if (isEditing) classes.push('editing');
+      if (isInRange && !isSelected) classes.push('in-range');
+      if (isMatch) classes.push('search-match');
+
+      html += `<td class="${classes.join(' ')}" style="${inlineStyle}"
+        data-row="${rowIdx}" data-col="${colIdx}"
+        onmousedown="onCellMouseDown(event, ${rowIdx}, ${colIdx})"
+        onmouseover="onCellMouseOver(event, ${rowIdx}, ${colIdx})"
+        ondblclick="startEdit(${rowIdx}, ${colIdx})"
+        oncontextmenu="showContextMenu(event, ${rowIdx}, ${colIdx})">`;
+
+      if (isEditing) {
+        html += renderEditCell(row, col, rowIdx, colIdx);
+      } else {
+        html += renderDisplayCell(row, col);
+      }
+
+      html += '</td>';
+    });
+    html += '</tr>';
+  });
+
+  tbody.innerHTML = html;
+
+  // Focus editing input
+  if (editingCell) {
+    const inp = document.getElementById('editInput');
+    if (inp) {
+      inp.focus();
+      if (inp.type === 'text') {
+        try {
+          inp.setSelectionRange(inp.value.length, inp.value.length);
+        } catch (e) {
+          // Safe fallback
+        }
+      }
+    }
+  }
+}
+
+function renderDisplayCell(row, col) {
+  const rawVal = row[col.key] ?? '';
+  const val = col.type !== 'status' ? evaluateFormula(rawVal, data, columns) : rawVal;
+  
+  if (col.type === 'status') {
+    return `<div class="cell-content">${getStatusBadge(val)}</div>`;
+  }
+  return `<div class="cell-content">${escapeHtml(String(val))}</div>`;
+}
+
+function renderEditCell(row, col, rowIdx, colIdx) {
+  const val = row[col.key] ?? '';
+  if (col.type === 'select' || col.type === 'status') {
+    const opts = col.options.map(o => 
+      `<option value="${o}" ${o === val ? 'selected' : ''}>${o}</option>`
+    ).join('');
+    return `<select id="editInput" onchange="commitEdit(this.value)" onkeydown="onEditKeyDown(event)" onblur="commitEdit(this.value)">${opts}</select>`;
+  }
+  if (col.type === 'date') {
+    return `<input id="editInput" type="date" value="${val}" onkeydown="onEditKeyDown(event)" onblur="commitEdit(this.value)">`;
+  }
+  if (col.type === 'number') {
+    return `<input id="editInput" type="text" inputmode="decimal" value="${val}" onkeydown="onEditKeyDown(event)" onblur="commitEdit(this.value)">`;
+  }
+  return `<input id="editInput" type="text" value="${escapeHtml(String(val))}" onkeydown="onEditKeyDown(event)" onblur="commitEdit(this.value)">`;
+}
+
+function getStatusBadge(status) {
+  const map = {
+    'Active': { icon: '🟢', cls: 'status-active' },
+    'Critical': { icon: '🔴', cls: 'status-critical' },
+    'Follow-up': { icon: '🟡', cls: 'status-followup' },
+    'Discharged': { icon: '⚪', cls: 'status-discharged' },
+  };
+  const s = map[status] || { icon: '', cls: '' };
+  return `<span class="status-badge ${s.cls}">${s.icon} ${status}</span>`;
+}
+
+// === CELL INTERACTION ===
+function onCellMouseDown(e, row, col) {
+  if (e.button === 2) return; // right-click handled separately
+  e.preventDefault();
+  hideContextMenu();
+
+  // If clicking a different cell while editing, commit first
+  if (editingCell && (editingCell.row !== row || editingCell.col !== col)) {
+    const inp = document.getElementById('editInput');
+    if (inp) commitEdit(inp.value);
+  }
+
+  selectedCell = { row, col };
+  rangeStart = { row, col };
+  rangeEnd = { row, col };
+  isSelecting = true;
+  editingCell = null;
+  selectionType = 'cell';
+  render();
+}
+
+function selectWholeRow(rowIdx) {
+  const inp = document.getElementById('editInput');
+  if (inp) commitEdit(inp.value);
+  selectedCell = { row: rowIdx, col: 0 };
+  rangeStart = { row: rowIdx, col: 0 };
+  rangeEnd = { row: rowIdx, col: columns.length - 1 };
+  isSelecting = false;
+  editingCell = null;
+  selectionType = 'row';
+  render();
+}
+
+function selectWholeColumn(colIdx) {
+  if (data.length === 0) return;
+  const inp = document.getElementById('editInput');
+  if (inp) commitEdit(inp.value);
+  const activeRows = visibleRows.length > 0 ? visibleRows : data.map((_, i) => i);
+  if (activeRows.length === 0) return;
+  selectedCell = { row: activeRows[0], col: colIdx };
+  rangeStart = { row: activeRows[0], col: colIdx };
+  rangeEnd = { row: activeRows[activeRows.length - 1], col: colIdx };
+  isSelecting = false;
+  editingCell = null;
+  selectionType = 'column';
+  render();
+}
+
+function selectAll() {
+  if (data.length === 0) return;
+  const inp = document.getElementById('editInput');
+  if (inp) commitEdit(inp.value);
+  const activeRows = visibleRows.length > 0 ? visibleRows : data.map((_, i) => i);
+  if (activeRows.length === 0) return;
+  selectedCell = { row: activeRows[0], col: 0 };
+  rangeStart = { row: activeRows[0], col: 0 };
+  rangeEnd = { row: activeRows[activeRows.length - 1], col: columns.length - 1 };
+  isSelecting = false;
+  editingCell = null;
+  selectionType = 'cell';
+  render();
+}
+
+function applyColor(color) {
+  if (!selectedCell && !rangeStart) return;
+  pushUndo();
+  
+  let r1 = selectedCell ? selectedCell.row : (rangeStart ? rangeStart.row : 0);
+  let r2 = r1;
+  let c1 = selectedCell ? selectedCell.col : (rangeStart ? rangeStart.col : 0);
+  let c2 = c1;
+
+  if (rangeStart && rangeEnd) {
+    r1 = Math.min(rangeStart.row, rangeEnd.row);
+    r2 = Math.max(rangeStart.row, rangeEnd.row);
+    c1 = Math.min(rangeStart.col, rangeEnd.col);
+    c2 = Math.max(rangeStart.col, rangeEnd.col);
+  }
+
+  // Iterate over data and apply colors
+  let changed = false;
+  for (let r = r1; r <= r2; r++) {
+    const rowObj = data[r];
+    if (!rowObj) continue;
+    if (!rowObj._cellStyles) rowObj._cellStyles = {};
+    for (let c = c1; c <= c2; c++) {
+      const colKey = columns[c].key;
+      if (rowObj._cellStyles[colKey] !== color) {
+        rowObj._cellStyles[colKey] = color;
+        changed = true;
+      }
+    }
+  }
+
+  if (changed) {
+    hasUnsaved = true;
+    render();
+  }
+}
+
+function onCellMouseOver(e, row, col) {
+  if (!isSelecting) return;
+  rangeEnd = { row, col };
+  render();
+}
+
+document.addEventListener('mouseup', () => { isSelecting = false; });
+
+function isCellInRange(row, col) {
+  if (!rangeStart || !rangeEnd) return false;
+  const r1 = Math.min(rangeStart.row, rangeEnd.row);
+  const r2 = Math.max(rangeStart.row, rangeEnd.row);
+  const c1 = Math.min(rangeStart.col, rangeEnd.col);
+  const c2 = Math.max(rangeStart.col, rangeEnd.col);
+  return row >= r1 && row <= r2 && col >= c1 && col <= c2;
+}
+
+// === EDITING ===
+function startEdit(row, col) {
+  pushUndo();
+  editingCell = { row, col };
+  selectedCell = { row, col };
+  render();
+}
+
+function commitEdit(value) {
+  if (!editingCell) return;
+  const col = columns[editingCell.col];
+
+  // Validate number
+  if (col.type === 'number') {
+    const num = parseInt(value);
+    value = isNaN(num) ? '' : num;
+  }
+
+  if (data[editingCell.row][col.key] !== value) {
+    data[editingCell.row][col.key] = value;
+    markUnsaved();
+  }
+
+  editingCell = null;
+  render();
+}
+
+function cancelEdit() {
+  editingCell = null;
+  render();
+}
+
+function onEditKeyDown(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const inp = document.getElementById('editInput');
+    commitEdit(inp.value);
+    // Move down or down+shift
+    if (e.shiftKey) {
+      moveSelection(0, -1);
+    } else {
+      moveSelection(0, 1);
+    }
+  } else if (e.key === 'Tab') {
+    e.preventDefault();
+    const inp = document.getElementById('editInput');
+    commitEdit(inp.value);
+    if (e.shiftKey) {
+      moveSelection(-1, 0);
+    } else {
+      moveSelection(1, 0);
+    }
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    cancelEdit();
+  }
+}
+
+// === NAVIGATION ===
+function moveSelection(dx, dy) {
+  if (!selectedCell) return;
+  let newCol = selectedCell.col + dx;
+  let newRow = selectedCell.row + dy;
+
+  // Wrap to next/prev row if going past column bounds
+  if (newCol >= columns.length) { newCol = 0; newRow++; }
+  if (newCol < 0) { newCol = columns.length - 1; newRow--; }
+
+  if (newRow < 0) newRow = 0;
+  if (newRow >= data.length) newRow = data.length - 1;
+
+  selectedCell = { row: newRow, col: newCol };
+  rangeStart = selectedCell;
+  rangeEnd = selectedCell;
+  render();
+
+  // Scroll into view
+  const cell = document.querySelector(`td[data-row="${newRow}"][data-col="${newCol}"]`);
+  if (cell) cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
+// Global keyboard handling
+document.addEventListener('keydown', (e) => {
+  // Ignore keypresses if the user is typing in an external input (like a chatbox or search bar)
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) {
+    return;
+  }
+
+  if (e.ctrlKey && (e.key === 'y' || e.key === 'Y' || (e.shiftKey && e.key === 'Z'))) {
+    e.preventDefault();
+    redo();
+    return;
+  }
+  
+  // Ctrl+Z: Undo
+  if (e.ctrlKey && e.key === 'z') {
+    e.preventDefault();
+    undo();
+    return;
+  }
+
+  // Ctrl+S: Save
+  if (e.ctrlKey && e.key === 's') {
+    e.preventDefault();
+    saveData();
+    return;
+  }
+  
+  // Ctrl+A: Select All
+  if (e.ctrlKey && e.key === 'a') {
+    e.preventDefault();
+    selectAllCells();
+    return;
+  }
+
+  // Ctrl+C: Copy
+  if (e.ctrlKey && e.key === 'c' && !editingCell) {
+    e.preventDefault();
+    handleCopy();
+    return;
+  }
+
+  // Ctrl+X: Cut
+  if (e.ctrlKey && e.key === 'x' && !editingCell) {
+    e.preventDefault();
+    handleCut();
+    return;
+  }
+
+  // Ctrl+V: Paste
+  if (e.ctrlKey && e.key === 'v' && !editingCell) {
+    e.preventDefault();
+    handlePaste();
+    return;
+  }
+
+  // Ctrl+D: Fill Down
+  if (e.ctrlKey && e.key === 'd') {
+    e.preventDefault();
+    if (!selectedCell) return;
+    pushUndo();
+    let r1 = selectedCell.row;
+    let r2 = selectedCell.row;
+    let c1 = selectedCell.col;
+    let c2 = selectedCell.col;
+    if (rangeStart && rangeEnd) {
+      r1 = Math.min(rangeStart.row, rangeEnd.row);
+      r2 = Math.max(rangeStart.row, rangeEnd.row);
+      c1 = Math.min(rangeStart.col, rangeEnd.col);
+      c2 = Math.max(rangeStart.col, rangeEnd.col);
+    }
+    if (r1 !== r2) {
+      for (let c = c1; c <= c2; c++) {
+        const col = columns[c];
+        const sourceVal = data[r1][col.key];
+        for (let r = r1 + 1; r <= r2; r++) {
+          data[r][col.key] = sourceVal;
+        }
+      }
+      markUnsaved();
+      render();
+    }
+    return;
+  }
+
+  // If editing, don't handle arrow keys globally
+  if (editingCell) return;
+
+  if (!selectedCell) return;
+
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    moveSelection(0, -1);
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    moveSelection(0, 1);
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    moveSelection(-1, 0);
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    moveSelection(1, 0);
+  } else if (e.key === 'Tab') {
+    e.preventDefault();
+    moveSelection(e.shiftKey ? -1 : 1, 0);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (e.shiftKey) {
+      moveSelection(0, -1);
+    } else {
+      startEdit(selectedCell.row, selectedCell.col);
+    }
+  } else if (e.key === 'Delete' || e.key === 'Backspace') {
+    e.preventDefault();
+    pushUndo();
+    let r1 = selectedCell.row;
+    let r2 = selectedCell.row;
+    let c1 = selectedCell.col;
+    let c2 = selectedCell.col;
+    if (rangeStart && rangeEnd) {
+      r1 = Math.min(rangeStart.row, rangeEnd.row);
+      r2 = Math.max(rangeStart.row, rangeEnd.row);
+      c1 = Math.min(rangeStart.col, rangeEnd.col);
+      c2 = Math.max(rangeStart.col, rangeEnd.col);
+    }
+    for (let r = r1; r <= r2; r++) {
+      for (let c = c1; c <= c2; c++) {
+        const col = columns[c];
+        data[r][col.key] = '';
+      }
+    }
+    markUnsaved();
+    render();
+  } else if (e.key === 'Escape') {
+    selectedCell = null;
+    rangeStart = null;
+    rangeEnd = null;
+    render();
+  } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    // Start typing → enter edit mode with the typed character
+    startEdit(selectedCell.row, selectedCell.col);
+    setTimeout(() => {
+      const inp = document.getElementById('editInput');
+      if (inp && inp.type === 'text') {
+        inp.value = e.key;
+        inp.setSelectionRange(1, 1);
+      }
+    }, 0);
+  }
+});
+
+// === UNDO / REDO ===
+function pushUndo() {
+  undoStack.push({
+    data: JSON.parse(JSON.stringify(data)),
+    columns: JSON.parse(JSON.stringify(columns))
+  });
+  if (undoStack.length > 30) undoStack.shift();
+  redoStack = [];
+  updateUndoRedoButtons();
+}
+
+function undo() {
+  if (undoStack.length === 0) return;
+  redoStack.push({
+    data: JSON.parse(JSON.stringify(data)),
+    columns: JSON.parse(JSON.stringify(columns))
+  });
+  const prevState = undoStack.pop();
+  if (Array.isArray(prevState)) {
+    data = prevState;
+  } else {
+    data = prevState.data;
+    columns = prevState.columns;
+  }
+  editingCell = null;
+  markUnsaved();
+  render();
+  updateUndoRedoButtons();
+}
+
+function redo() {
+  if (redoStack.length === 0) return;
+  undoStack.push({
+    data: JSON.parse(JSON.stringify(data)),
+    columns: JSON.parse(JSON.stringify(columns))
+  });
+  const nextState = redoStack.pop();
+  if (Array.isArray(nextState)) {
+    data = nextState;
+  } else {
+    data = nextState.data;
+    columns = nextState.columns;
+  }
+  editingCell = null;
+  markUnsaved();
+  render();
+  updateUndoRedoButtons();
+}
+
+function updateUndoRedoButtons() {
+  const undoBtn = document.getElementById('undoBtn');
+  const redoBtn = document.getElementById('redoBtn');
+  if (undoBtn) undoBtn.disabled = undoStack.length === 0;
+  if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+}
+
+// === CLIPBOARD ===
+async function handleCopy() {
+  if (!selectedCell) return;
+  let r1 = selectedCell.row;
+  let r2 = r1;
+  let c1 = selectedCell.col;
+  let c2 = c1;
+  if (rangeStart && rangeEnd) {
+    r1 = Math.min(rangeStart.row, rangeEnd.row);
+    r2 = Math.max(rangeStart.row, rangeEnd.row);
+    c1 = Math.min(rangeStart.col, rangeEnd.col);
+    c2 = Math.max(rangeStart.col, rangeEnd.col);
+  }
+  let tsv = '';
+  for (let r = r1; r <= r2; r++) {
+    const row = data[r];
+    if (!row) continue;
+    const rowData = [];
+    for (let c = c1; c <= c2; c++) {
+      rowData.push(row[columns[c].key] || '');
+    }
+    tsv += rowData.join('\t') + '\n';
+  }
+  try {
+    await navigator.clipboard.writeText(tsv);
+    showToast('Copied to clipboard');
+  } catch (err) {
+    console.error('Failed to copy', err);
+  }
+}
+
+async function handleCut() {
+  await handleCopy();
+  pushUndo();
+  let r1 = selectedCell.row;
+  let r2 = r1;
+  let c1 = selectedCell.col;
+  let c2 = c1;
+  if (rangeStart && rangeEnd) {
+    r1 = Math.min(rangeStart.row, rangeEnd.row);
+    r2 = Math.max(rangeStart.row, rangeEnd.row);
+    c1 = Math.min(rangeStart.col, rangeEnd.col);
+    c2 = Math.max(rangeStart.col, rangeEnd.col);
+  }
+  for (let r = r1; r <= r2; r++) {
+    for (let c = c1; c <= c2; c++) {
+      data[r][columns[c].key] = '';
+    }
+  }
+  markUnsaved();
+  render();
+}
+
+async function handlePaste() {
+  if (!selectedCell) return;
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text) return;
+    pushUndo();
+    const rows = text.split('\n').map(r => r.split('\t'));
+    if (rows.length > 0 && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === '') {
+      rows.pop(); 
+    }
+    
+    let startRow = selectedCell.row;
+    let startCol = selectedCell.col;
+    
+    for (let i = 0; i < rows.length; i++) {
+      const r = startRow + i;
+      if (r >= data.length) break;
+      for (let j = 0; j < rows[i].length; j++) {
+        const c = startCol + j;
+        if (c >= columns.length) break;
+        data[r][columns[c].key] = rows[i][j];
+      }
+    }
+    markUnsaved();
+    render();
+  } catch (err) {
+    console.error('Failed to paste', err);
+  }
+}
+
+function selectAllCells() {
+  if (data.length === 0) return;
+  selectedCell = { row: 0, col: 0 };
+  rangeStart = { row: 0, col: 0 };
+  rangeEnd = { row: data.length - 1, col: columns.length - 1 };
+  render();
+}
+
+// === ROW OPERATIONS ===
+function addRow() {
+  pushUndo();
+  const id = `PAT-${String(nextPatientNum++).padStart(3, '0')}`;
+  const today = new Date().toISOString().split('T')[0];
+  data.push({
+    patientId: id, patientName: '', age: '', gender: 'Male',
+    diagnosis: '', doctor: '', visitDate: today, status: 'Active', notes: ''
+  });
+  markUnsaved();
+  render();
+  // Select first editable cell of new row
+  selectedCell = { row: data.length - 1, col: 1 };
+  rangeStart = selectedCell;
+  rangeEnd = selectedCell;
+  render();
+  // Scroll to bottom
+  const wrapper = document.getElementById('spreadsheetWrapper');
+  wrapper.scrollTop = wrapper.scrollHeight;
+}
+
+function deleteSelected() {
+  if (!selectedCell && !rangeStart) return;
+  
+  if (selectionType === 'column') {
+    let c1 = selectedCell.col;
+    let c2 = selectedCell.col;
+    if (rangeStart && rangeEnd) {
+      c1 = Math.min(rangeStart.col, rangeEnd.col);
+      c2 = Math.max(rangeStart.col, rangeEnd.col);
+    }
+    const colLabels = [];
+    for (let i = c1; i <= c2; i++) {
+      colLabels.push(columns[i].label);
+    }
+    if (!confirm(`Clear all values in column(s): ${colLabels.join(', ')}?`)) return;
+    pushUndo();
+    data.forEach(row => {
+      for (let i = c1; i <= c2; i++) {
+        row[columns[i].key] = '';
+      }
+    });
+    markUnsaved();
+    render();
+    return;
+  }
+
+  const r1 = rangeStart ? Math.min(rangeStart.row, rangeEnd.row) : selectedCell.row;
+  const r2 = rangeStart ? Math.max(rangeStart.row, rangeEnd.row) : selectedCell.row;
+
+  if (!confirm(`Delete ${r2 - r1 + 1} row(s)?`)) return;
+
+  pushUndo();
+  data.splice(r1, r2 - r1 + 1);
+  selectedCell = null;
+  rangeStart = null;
+  rangeEnd = null;
+  editingCell = null;
+  markUnsaved();
+  render();
+}
+
+function handleSerialize() {
+  if (!rangeStart || !rangeEnd) {
+    showToast('Please select a range of cells vertically to serialize first.');
+    return;
+  }
+  
+  let r1 = Math.min(rangeStart.row, rangeEnd.row);
+  let r2 = Math.max(rangeStart.row, rangeEnd.row);
+  let c1 = Math.min(rangeStart.col, rangeEnd.col);
+  let c2 = Math.max(rangeStart.col, rangeEnd.col);
+  
+  if (r1 === r2) {
+    showToast('Please select at least two cells vertically to serialize.');
+    return;
+  }
+
+  pushUndo();
+  
+  const incrementValue = (val, step) => {
+    if (val === null || val === undefined || val === '') return step;
+    const numMatch = String(val).match(/^(.*?)(\d+)$/);
+    if (numMatch && isNaN(val)) {
+      const prefix = numMatch[1];
+      const numStr = numMatch[2];
+      const nextNum = parseInt(numStr) + step;
+      return prefix + String(nextNum).padStart(numStr.length, '0');
+    }
+    if (!isNaN(val) && val !== '') {
+      return Number(val) + step;
+    }
+    const dateReg = /^\d{4}-\d{2}-\d{2}$/;
+    if (dateReg.test(val)) {
+      const d = new Date(val);
+      if (!isNaN(d.getTime())) {
+        d.setDate(d.getDate() + step);
+        return d.toISOString().split('T')[0];
+      }
+    }
+    return val;
+  };
+
+  for (let c = c1; c <= c2; c++) {
+    const col = columns[c];
+    let sourceVal = data[r1][col.key];
+    if (sourceVal === null || sourceVal === undefined || sourceVal === '') {
+      sourceVal = '1';
+      data[r1][col.key] = '1';
+    }
+    let step = 1;
+    for (let r = r1 + 1; r <= r2; r++) {
+      data[r][col.key] = incrementValue(sourceVal, step++);
+    }
+  }
+
+  markUnsaved();
+  render();
+  showToast('Serialization complete!');
+}
+
+// === CONTEXT MENU ===
+function showContextMenu(e, row, col) {
+  e.preventDefault();
+  contextRow = row;
+  contextCol = col;
+  
+  const isInsideRange = isCellInRange(row, col);
+  if (!isInsideRange) {
+    selectedCell = { row, col };
+    rangeStart = selectedCell;
+    rangeEnd = selectedCell;
+  }
+  render();
+
+  const menu = document.getElementById('contextMenu');
+  menu.style.left = e.clientX + 'px';
+  menu.style.top = e.clientY + 'px';
+  menu.classList.add('show');
+}
+
+function hideContextMenu() {
+  document.getElementById('contextMenu').classList.remove('show');
+}
+
+document.addEventListener('click', hideContextMenu);
+
+function contextAction(action) {
+  hideContextMenu();
+  pushUndo();
+
+  if (action === 'insertAbove') {
+    const id = `PAT-${String(nextPatientNum++).padStart(3, '0')}`;
+    const today = new Date().toISOString().split('T')[0];
+    data.splice(contextRow, 0, {
+      patientId: id, patientName: '', age: '', gender: 'Male',
+      diagnosis: '', doctor: '', visitDate: today, status: 'Active', notes: ''
+    });
+  } else if (action === 'insertBelow') {
+    const id = `PAT-${String(nextPatientNum++).padStart(3, '0')}`;
+    const today = new Date().toISOString().split('T')[0];
+    data.splice(contextRow + 1, 0, {
+      patientId: id, patientName: '', age: '', gender: 'Male',
+      diagnosis: '', doctor: '', visitDate: today, status: 'Active', notes: ''
+    });
+  } else if (action === 'deleteRow') {
+    let r1 = contextRow;
+    let r2 = contextRow;
+    if (rangeStart && rangeEnd) {
+      r1 = Math.min(rangeStart.row, rangeEnd.row);
+      r2 = Math.max(rangeStart.row, rangeEnd.row);
+    }
+    data.splice(r1, r2 - r1 + 1);
+    selectedCell = null;
+    rangeStart = null;
+    rangeEnd = null;
+  } else if (action === 'clearCell') {
+    let r1 = contextRow;
+    let r2 = contextRow;
+    let c1 = contextCol;
+    let c2 = contextCol;
+    if (rangeStart && rangeEnd) {
+      r1 = Math.min(rangeStart.row, rangeEnd.row);
+      r2 = Math.max(rangeStart.row, rangeEnd.row);
+      c1 = Math.min(rangeStart.col, rangeEnd.col);
+      c2 = Math.max(rangeStart.col, rangeEnd.col);
+    }
+    for (let r = r1; r <= r2; r++) {
+      for (let c = c1; c <= c2; c++) {
+        const col = columns[c];
+        data[r][col.key] = '';
+      }
+    }
+  } else if (action === 'clearColumn') {
+    const col = columns[contextCol];
+    data.forEach(row => {
+      row[col.key] = '';
+    });
+  } else if (action === 'fillDown') {
+    let r1 = contextRow;
+    let r2 = contextRow;
+    let c1 = contextCol;
+    let c2 = contextCol;
+    if (rangeStart && rangeEnd) {
+      r1 = Math.min(rangeStart.row, rangeEnd.row);
+      r2 = Math.max(rangeStart.row, rangeEnd.row);
+      c1 = Math.min(rangeStart.col, rangeEnd.col);
+      c2 = Math.max(rangeStart.col, rangeEnd.col);
+    }
+    if (r1 !== r2) {
+      for (let c = c1; c <= c2; c++) {
+        const col = columns[c];
+        const sourceVal = data[r1][col.key];
+        for (let r = r1 + 1; r <= r2; r++) {
+          data[r][col.key] = sourceVal;
+        }
+      }
+    }
+  } else if (action === 'fillSeries') {
+    let r1 = contextRow;
+    let r2 = contextRow;
+    let c1 = contextCol;
+    let c2 = contextCol;
+    if (rangeStart && rangeEnd) {
+      r1 = Math.min(rangeStart.row, rangeEnd.row);
+      r2 = Math.max(rangeStart.row, rangeEnd.row);
+      c1 = Math.min(rangeStart.col, rangeEnd.col);
+      c2 = Math.max(rangeStart.col, rangeEnd.col);
+    }
+    if (r1 !== r2) {
+      const incrementValue = (val, step) => {
+        if (val === null || val === undefined || val === '') return '';
+        const numMatch = String(val).match(/^(.*?)(\d+)$/);
+        if (numMatch && isNaN(val)) {
+          const prefix = numMatch[1];
+          const numStr = numMatch[2];
+          const nextNum = parseInt(numStr) + step;
+          return prefix + String(nextNum).padStart(numStr.length, '0');
+        }
+        if (!isNaN(val) && val !== '') {
+          return Number(val) + step;
+        }
+        const dateReg = /^\d{4}-\d{2}-\d{2}$/;
+        if (dateReg.test(val)) {
+          const d = new Date(val);
+          if (!isNaN(d.getTime())) {
+            d.setDate(d.getDate() + step);
+            return d.toISOString().split('T')[0];
+          }
+        }
+        return val;
+      };
+
+      for (let c = c1; c <= c2; c++) {
+        const col = columns[c];
+        const sourceVal = data[r1][col.key];
+        let step = 1;
+        for (let r = r1 + 1; r <= r2; r++) {
+          data[r][col.key] = incrementValue(sourceVal, step++);
+        }
+      }
+    }
+  } else if (action === 'copyRow') {
+    const id = `PAT-${String(nextPatientNum++).padStart(3, '0')}`;
+    const copy = { ...data[contextRow], patientId: id };
+    data.splice(contextRow + 1, 0, copy);
+  }
+
+  markUnsaved();
+  render();
+}
+
+// === COLUMN RESIZE ===
+function startResize(e, colIdx) {
+  e.preventDefault();
+  e.stopPropagation();
+  resizingCol = colIdx;
+  resizeStartX = e.clientX;
+  resizeStartWidth = columns[colIdx].width;
+
+  document.addEventListener('mousemove', onResize);
+  document.addEventListener('mouseup', stopResize);
+}
+
+function onResize(e) {
+  if (resizingCol === null) return;
+  const diff = e.clientX - resizeStartX;
+  const newWidth = Math.max(50, resizeStartWidth + diff);
+  columns[resizingCol].width = newWidth;
+  render();
+}
+
+function stopResize() {
+  resizingCol = null;
+  document.removeEventListener('mousemove', onResize);
+  document.removeEventListener('mouseup', stopResize);
+}
+
+// === SEARCH ===
+function handleSearch() {
+  searchTerm = document.getElementById('searchInput').value;
+  editingCell = null;
+  render();
+}
+
+function addColumn() {
+  pushUndo();
+  const newColIdx = columns.length;
+  const getLetter = (num) => {
+    let letter = '';
+    while (num >= 0) {
+      letter = String.fromCharCode(65 + (num % 26)) + letter;
+      num = Math.floor(num / 26) - 1;
+    }
+    return letter;
+  };
+  const letter = getLetter(newColIdx);
+  const newKey = `customCol_${Date.now()}`;
+  const newCol = { key: newKey, label: 'New Column', letter: letter, width: 120, type: 'text' };
+  
+  columns.push(newCol);
+  hasUnsaved = true;
+  render();
+  
+  showToast('Column added! Double click its header to rename.');
+}
+
+// === SAVE / EXPORT ===
+function markUnsaved() {
+  hasUnsaved = true;
+  document.getElementById('unsavedIndicator').classList.add('show');
+}
+
+function saveData() {
+  localStorage.setItem('cms_patient_data', JSON.stringify(data));
+  localStorage.setItem('cms_next_id', nextPatientNum);
+  hasUnsaved = false;
+  document.getElementById('unsavedIndicator').classList.remove('show');
+  showToast('✅ Changes saved successfully!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function exportCSV() {
+  const headers = columns.map(c => c.label);
+  const rows = data.map(row => columns.map(c => `"${String(row[c.key] ?? '').replace(/"/g, '""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `patient_records_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function updateRowCount() {
+  const total = data.length;
+  const shown = visibleRows.length;
+  document.getElementById('rowCount').textContent = `Showing ${shown} of ${total} patients`;
+}
+
+// === UTILITY ===
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// === LOAD SAVED DATA ===
+function loadData() {
+  const saved = localStorage.getItem('cms_patient_data');
+  if (saved) {
+    try {
+      data = JSON.parse(saved);
+      nextPatientNum = parseInt(localStorage.getItem('cms_next_id')) || data.length + 1;
+    } catch(e) {}
+  }
+}
+
+function triggerImport() {
+  document.getElementById('importInput').click();
+}
+
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const dataBytes = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(dataBytes, { type: 'array' });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      if (json.length < 2) {
+        showToast('Import failed: File is empty or lacks headers.');
+        return;
+      }
+
+      const headers = json[0].map(h => String(h).trim().toLowerCase());
+      const rows = json.slice(1);
+
+      // Map headers to column keys
+      const colMapping = {};
+      columns.forEach(col => {
+        const label = col.label.trim().toLowerCase();
+        const idx = headers.indexOf(label);
+        if (idx !== -1) {
+          colMapping[col.key] = idx;
+        } else {
+          const letterIdx = headers.indexOf(col.letter.trim().toLowerCase());
+          if (letterIdx !== -1) {
+            colMapping[col.key] = letterIdx;
+          }
+        }
+      });
+
+      if (Object.keys(colMapping).length === 0) {
+        showToast('Import failed: Could not match any column headers.');
+        return;
+      }
+
+      // Parse rows
+      const parsedData = rows.map(rowArr => {
+        const newRow = {};
+        columns.forEach(col => {
+          const fileColIdx = colMapping[col.key];
+          let val = fileColIdx !== undefined ? rowArr[fileColIdx] : undefined;
+          newRow[col.key] = (val === undefined || val === null) ? '' : val;
+        });
+        return newRow;
+      });
+
+      // Handle patient IDs
+      let nextId = nextPatientNum;
+      const updatedParsedData = parsedData.map(row => {
+        const updatedRow = { ...row };
+        if (!updatedRow.patientId || String(updatedRow.patientId).trim() === '') {
+          updatedRow.patientId = `PAT-${String(nextId++).padStart(3, '0')}`;
+        }
+        return updatedRow;
+      });
+
+      const append = confirm("Append imported rows to existing data? (Select 'Cancel' to replace all existing data instead)");
+      pushUndo();
+      if (append) {
+        data = [...data, ...updatedParsedData];
+        nextPatientNum = nextId;
+      } else {
+        const proceedReplace = confirm("Are you sure you want to delete all existing rows and replace them with the imported data?");
+        if (!proceedReplace) return;
+        data = updatedParsedData;
+        nextPatientNum = nextId;
+      }
+      
+      markUnsaved();
+      render();
+      showToast(`Successfully imported ${updatedParsedData.length} row(s)!`);
+    } catch (err) {
+      console.error(err);
+      showToast('Import failed: Invalid file format or parsing error.');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value = '';
+}
+
+// === INIT ===
+loadData();
+render();
+
+</script>
+</body>
+</html>

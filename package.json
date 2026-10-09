@@ -1,0 +1,100 @@
+{
+  "name": "jspulse-ohms",
+  "private": true,
+  "version": "1.0.26",
+  "description": "JSPulse OHMS - Occupational Health Management System",
+  "author": "JSPulse OHMS Development Team",
+  "type": "module",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "electron:dev": "node generate-icon.js && node generate-ico.cjs && concurrently -k \"cross-env BROWSER=none npm run dev\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "node generate-icon.js && node generate-ico.cjs && npm run build && electron-builder",
+    "electron:build:all": "node generate-icon.js && node generate-ico.cjs && npm run build && electron-builder -wml"
+  },
+  "build": {
+    "appId": "com.jspulse.ohms",
+    "productName": "JSPulse OHMS",
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist-final"
+    },
+    "electronLanguages": [
+      "en",
+      "en-US"
+    ],
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "icon": "build/icon.ico",
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.medical"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "MedicalSoftware"
+    }
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@google/generative-ai": "^0.24.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.2",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "lucide-react": "^1.17.0",
+    "png-to-ico": "^3.0.1",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.8.1",
+    "sharp": "^0.35.1",
+    "vite": "^8.0.12",
+    "vite-plugin-pwa": "^1.3.0",
+    "wait-on": "^9.0.10",
+    "xlsx": "^0.18.5"
+  }
+}

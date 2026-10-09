@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      themeVariables: {
+        fontSize: '18px',
+        fontFamily: 'Arial, Helvetica, sans-serif'
+      },
+      flowchart: {
+        nodeSpacing: 30,
+        rankSpacing: 40,
+        diagramPadding: 20,
+        htmlLabels: true,
+        curve: 'basis',
+        useMaxWidth: false
+      },
+      sequence: {
+        diagramMarginX: 30,
+        diagramMarginY: 20,
+        actorMargin: 80,
+        width: 200,
+        height: 50,
+        boxMargin: 10,
+        boxTextMargin: 8,
+        noteMargin: 15,
+        messageMargin: 40,
+        messageFontSize: 16,
+        actorFontSize: 18,
+        noteFontSize: 14,
+        useMaxWidth: false
+      },
+      state: {
+        useMaxWidth: false
+      }
+    });
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: white;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .mermaid {
+      display: inline-block;
+      font-size: 18px !important;
+    }
+    .mermaid text {
+      font-size: 16px !important;
+    }
+    .mermaid .nodeLabel {
+      font-size: 16px !important;
+      padding: 8px !important;
+    }
+    .mermaid .edgeLabel {
+      font-size: 14px !important;
+    }
+    .mermaid .actor {
+      font-size: 16px !important;
+    }
+    .mermaid .messageText {
+      font-size: 15px !important;
+    }
+    .mermaid .noteText {
+      font-size: 14px !important;
+    }
+    .mermaid .label {
+      font-size: 16px !important;
+    }
+    .mermaid .statediagram-state .state-title {
+      font-size: 16px !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="mermaid" id="diagram">
+erDiagram
+    PATIENT_VISITS ||--o{ DISPENSE_LOG : generates
+    DISPENSE_LOG }o--|| MED_STOCK : deducts
+    
+    PATIENT_VISITS {
+        string date
+        string empCode PK
+        string patientName
+        string drName
+        string medicinesDetails
+        boolean extracted
+    }
+    DISPENSE_LOG {
+        string id PK
+        string date
+        string patientName
+        string medicineName FK
+        int quantity
+        string status
+    }
+    MED_STOCK {
+        string id PK
+        string medicineName
+        string category
+        int quantity
+        date expiry
+        int reorderLevel
+    }
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    setTimeout(() => {
+        const el = document.getElementById('diagram');
+        const svg = el.querySelector('svg');
+        let w, h;
+        if (svg) {
+            const bbox = svg.getBBox();
+            w = Math.ceil(bbox.width) + 100;
+            h = Math.ceil(bbox.height) + 100;
+        } else {
+            const rect = el.getBoundingClientRect();
+            w = Math.ceil(rect.width) + 100;
+            h = Math.ceil(rect.height) + 100;
+        }
+        ipcRenderer.send('diagram-ready', { width: w, height: h });
+    }, 3000);
+  </script>
+</body>
+</html>
